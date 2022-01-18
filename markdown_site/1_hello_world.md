@@ -3,36 +3,121 @@
 ## Setting up
 
 * Setup the site
-```
+```ps1
+npm install -g gatsby-cli
+
 gatsby new
 # Name : kata
 # location : default
 # CMS : No
 # Styling : No
-# Additional stuff : With MDX support
+# Additional stuff : Add markdown and MDX support
 # Should we do this : y
 
 gatsby develop
-# Go to localhost:8000
 ```
 
-# Introduce markdown with routing
-* Check that all the dependancies you introduced before are covered here
-
+## Introduce markdown with routing
 * Create the src/pages/markdown directory
     * Put in some markdown pages
+        * first.md
+            * Give it the heading "#First Page"
+        * second.md
+            * Give it the heading "#Second Page"
+
+    * Give them a #title and a paragraph of text
+
     * These are now the content
 
+* Handle the markdown remark dependancies:
+    * npm install gatsby-transformer-remark
+
+    * Add this to the gatsby-config.js, into the plugins array
+        * "gatsby-transformer-remark"
+
 * Routing  
-    * Remove all the slug shit
-    * Add in the page that renders shit
-    * Add in the routing
+    * Create the file:
+        * src\pages\{MarkdownRemark.parent__(File)__name}.js
 
-# Linking to things:
-* Introduce the Grapqhl page
-    * Use this to create a query for getting all the markdown pages
+    * Give it the code:
+    ```jsx
+    import React from "react"
+    import { graphql } from "gatsby"
 
-* Index.js
-    * Take the above query
-    * Render out the results
-    * Making links to the things
+    export default function Template({
+      data,
+    }) {
+      const { markdownRemark } = data;
+      const { html } = markdownRemark;
+      return (
+        <div
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      )
+    }
+
+    export const pageQuery = graphql`
+      query($id: String!) {
+        markdownRemark(id: { eq: $id }) {
+          html
+        }
+      }
+    `
+    ```
+
+    * Navigate to the markdown pages!
+        * navigate to the developers 404 page:
+            * localhost:8000/f/f
+        * Select first and second
+        * You should now see the contents of the .md files
+
+# Linking To these pages from the home page:
+
+* Write the graphql query:
+    * use localhost:8000/__graphql
+    * Write a query that:
+        * Gets all markdown remark pages:
+            * File name
+            * File heading
+
+* Make the index.js file render those values
+    * Clear out index.js
+
+    * Add the graphql query
+        * import { graphql } from "gatsby"
+        * Write the query
+
+    * Add the element
+        * import * as React from "react";
+        * export default function Index()
+        * Extract the data from it
+
+* Finished example:
+    ```jsx
+    export default function Index({data})
+    {
+        const { allMarkdownRemark } = data;
+        const { nodes } = allMarkdownRemark;
+
+        const mappedNodes = nodes.map((node, index) => {
+            const fileName = node.parent.name;
+            const heading = node.headings[0].value;
+
+            return (
+                <li key={index}>
+                    <a href={fileName}>
+                        heading : {heading}
+                    </a>
+                </li>
+            );
+        });
+
+        return (
+            <div>
+                <ul>
+                    { mappedNodes }
+                </ul>
+            </div>
+        );
+    }
+    ```
