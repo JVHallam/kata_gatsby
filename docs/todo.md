@@ -1,37 +1,24 @@
-* Creating gatsby jsx pages
-
-* What's graphql and why is it here?
-    * GRAPHQL IS BAE
-    * Do a section on converting Graphql to routes
-
-* Routes:
-    * Routes are a super useful thing to have a kata on
-    * There's the file system routes {MarkdownRemark.name}
-        * Does the query inside of this file, also filter out which files are being selected?
-
 * Alternative routing:
     * If you want more complex queries, you have to use the gatsby-node.js file
     * gatsby-node.js will run on start up
     * Your routes can be defined in here too
     * You can use the more complex graphql queries too
+    * Filtering out routes (docs) - using graphql
 
-* Gatsby is basically:
-    * Graphql 
-    * Routes
+* Plugins:
+    * Do plugin stuff
 
-* Embedding content in other pages
-    * I want to embed one page into another
-    * Not using iframes
+* I could have a quick section on Some React stuff
+    * Layout Components:
+        * src/components/layout.js
+        * https://www.gatsbyjs.com/docs/how-to/routing/layout-components/ 
+        * Again, wrap your pages in a layout component
+        * combine it with https://www.gatsbyjs.com/docs/reference/config-files/gatsby-ssr/#wrapPageElement
+        * That auto wraps your page with content
 
-* Dynamic link generation:
-    * Use gatsby
-    * I want it to dynamically generate a list of links to pages automatically
-
-* State persistance and toggles
-    * This would be a react part
-    * Saving state
-        * Retrieving state
-        * Very basic. I'm looking to save a single boolean
-    * A toggle to hide / show code examples
-
-
+    * State persistance and toggles
+        * This would be a react part
+        * Saving state
+            * Retrieving state
+            * Very basic. I'm looking to save a single boolean
+        * A toggle to hide / show code examples
