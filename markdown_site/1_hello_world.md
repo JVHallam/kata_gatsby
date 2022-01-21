@@ -20,7 +20,8 @@ gatsby develop
 ```
 
 ## Introduce markdown with routing
-* Create the src/pages/markdown directory
+* Create the markdown directory, with content
+    * Create the directory src/pages/markdown
     * Put in some markdown pages
         * first.md
             * Give it the heading "# First Page"
@@ -28,10 +29,6 @@ gatsby develop
         * second.md
             * Give it the heading "# Second Page"
             * Give it the paragraph "Hey, this is the second page!"
-
-    * Give them a #title and a paragraph of text
-
-    * These are now the content
 
 * Routing  
     * Create the file:
