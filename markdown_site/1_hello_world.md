@@ -1,9 +1,14 @@
 # Hello World!
 
+## Pre-requisites:
+* Have node js installed
+* Have npm installed
+
 ## Setting up
 
 * Setup the site
 ```ps1
+# Install gatsby
 npm install -g gatsby-cli
 
 gatsby new
