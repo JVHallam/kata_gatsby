@@ -1,205 +1,140 @@
 # Filesystem Routing:
 
 # Refactoring this exercise:
-* Create the content
-* Create the content routing page
-    * Use the {MarkdownRemark.parent__(File)__relativeDirectory}/{MarkdownRemark.parent__(File)__name}.js    
+
 * Create the first.js page
 * Create the index.js page to link to those
     * Link is below
     * Duplicate first.js to be second.js
 
 
+-------------------------------------------------------------------------------------------------------------------
 
-# Create some routes:
-* Create Some embedded files
-    * src/pages/first/one.md
-    * src/pages/first/two.md
-    * src/pages/second/one.md
-    * src/pages/second/two.md
+# Refactor
 
-* Play with some __graphql routes
+# Creating the content and structures
+* Create the content:
+    * Create Some embedded files
+        * src/pages/first/one.md -> "# First - One"
+        * src/pages/first/two.md -> "# First - two"
+        * src/pages/second/one.md -> "# Second - one"
+        * src/pages/second/two.md -> "# Second - two"
 
-* Make the routes:
-    * Use the {MarkdownRemark.parent__(File)__relativeDirectory}/{MarkdownRemark.parent__(File)__name}.js    
-    * <root>/directory/filename
-        * <root>/first/one
-        * <root>/first/two
-        * <root>/second/one
-        * <root>/second/two
+* Route to it:
+    * Create the routes:
+        * first/one
+        * first/two
+        * second/one
+        * second/two
 
-* Use the 404 page to route to them:
+    * Use the src/pages/{MarkdownRemark.parent__(File)__relativeDirectory}/{MarkdownRemark.parent__(File)__name}.js    
+        * Completed component:
+        ```jsx
+        import React from "react"
+        import { graphql } from "gatsby"
 
+        const ComponentName = ({ data }) => {
+            const { html } = data.markdownRemark;
 
-
-* Make
-    * <root>/first/index.js
-    ```jsx
-    import React from "react"
-    import { graphql } from "gatsby"
-
-    export const query = graphql`
-    query MyQuery {
-      allFile(filter: {relativeDirectory: {regex: "/first/g"}}) {
-        edges {
-          node {
-            name
-          }
+            return (
+                <div dangerouslySetInnerHTML={{ __html: html }} />
+            );
         }
-      }
-    }
-    `
 
-    export default function First({ data })
+        export const query = graphql`
+        query($id : String!)
+        {
+            markdownRemark(id : { eq : $id })
+            {
+                html
+            }
+        }
+        `
+
+        export default ComponentName
+        ```
+
+* Check:
+    * Go to the 404 page
+    * Check that you have the pages:
+        * first/one
+        * first/two
+        * second/one
+        * second/two
+
+# Creating links to the new pages
+
+* first.js
+    * src/pages/first.js
+    ```jsx
+    import * as React from "react"
+    import { grapqhl, Link } from "gatsby"
+
+    export default function Page()
     {
-        console.log(data);
-
         return (
             <div>
-                Test
+                This is the page!
             </div>
         );
     }
     ```
 
-    * Add to the gatsby-config.js - plugins
+    * You can now route to this page via localhost:8000/first
+
+* Get the children and render them out
+    * We're trying to grab the first/one.md and first/two.md pages
+    * Create a query that can select markdown pages with the relative directory of "first"
+    * localhost:8000/__grapqhl
+    * Result:
     ```js
-    {
-        resolve: 'gatsby-source-filesystem',
-        options: {
-            "name": "pages",
-            "path": "./src/pages/first"
-        },
-        __key: "pages"
-    }
-    ```
-
-* Duplicate this for second
-
-
--------------------------------------------------------------------------------------------------------------------
-
-* Make the index.js page link to this
-import React from "react"
-import { Link, graphql } from "gatsby"
-
-export default function Index({ data })
-{
-    console.log(data);
-
-    const directories = data.allMarkdownRemark.nodes.map(node => node.parent.relativeDirectory);
-
-    const uniqueDirectories = [...new Set(directories)];
-
-    const listElements = uniqueDirectories.map((name,index) => {
-        return (
-            <li key={index}>
-                <Link to={name}>{name}</Link>
-            </li>
-        );
-    });
-
-    return (
-        <div>
-            <ul>
-                { listElements }
-            </ul>
-        </div>
-    );
-}
-
-export const query = graphql`
-{
-  allMarkdownRemark {
-    nodes {
-      parent {
-        ... on File {
+    query MyQuery {
+      allFile(filter: {relativeDirectory: {eq: "first"}}) {
+        nodes {
+          name
           relativeDirectory
         }
       }
     }
-  }
-}
-`
+    ```
 
+    * Add this to to the component and render out the path:
+        * use the "Link" component to link to the file's "name"
+        * <Link to={name}> {name} </Link>
 
--------------------------------------------------------------------------------------------------------------------
+* second.js
+    * Copy first.js
+    * name it second.js
+    * Have it render src/pages/second's child files
 
-# Generate some embedded rendering:
-* Have this
-    * {MarkdownRemark.parent__(File)__relativeDirectory}.js
-    * Just echo out "PAGE"
+    * 404 page -> should link to second
+    * Second -> one and second -> two are now navigatable
+        * Check the contents are for "second" and not "first"
+
+# Create links to the new delegation pages
+* Make index.js render links to first and second
+    * Clear out index.js
+    * Create a list of pages
+        * Link to first
+        * Link to second
+
+    * Example:
     ```jsx
-    import React from "react"
-    import { graphql } from "gatsby"
+    import * as React from "react";
+    import { Link } from "gatsby";
 
-    export default function Template({
-        data,
-    }) {
+    export default function Index()
+    {
         return (
-            <div> This should be first and second </div>
-        )
+            <div>
+                This is this index page!
+                <ul>
+                    <li><Link to="first"> First </Link></li>
+                    <li><Link to="second"> Second </Link></li>
+                </ul>
+            </div>
+        );
     }
     ```
-    * Navigate to the 404
-    * /first and /second should now be routes - no more additional routes
-    * /first/one and so on, should still work
 
-* Have /first and /second render out their children respectively - and only their children
-    * Conver that route into a query
-    * Make it on the page
-    * Get the relativeDirectory, that's being used to render the page
-    * Echo it out, on the page
-
-------------------------------------------------------------------------------------------------------------
-
-//All files, is the children of the directory
-export const pageQuery = graphql`
-query MyQuery {
-  allFile(filter: {relativeDirectory: {eq: "first"}}) {
-    edges {
-      node {
-        id
-        name
-      }
-    }
-  }
-}
-`
-
-//Directory is the directory i'm trying to render
-query MyQuery {
-  allFile(filter: {relativeDirectory: {eq: "first"}}) {
-    edges {
-      node {
-        id
-        name
-      }
-    }
-  }
-  directory(name: {eq: "first"}) {
-    id
-    name
-  }
-}
-
-//Render the directory's name, on the page
-props.data.directory.name
-
-//Now add in the relativeDirectory part
-
-
-------------------------------------------------------------------------------------------------------------
-
-* src/pages/first/index.js
-    * Renders out links to first/one and two
-
-* src/pages/second/index.js
-    * Renders out links to second/one and two
-
-* Route to them
-    * home index.js
-    * routes to the above
-
-# Auto route generation
-* Can i combine the above two into one file?
+* Test you can navigate to the four pages
