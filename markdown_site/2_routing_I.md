@@ -1,17 +1,5 @@
 # Filesystem Routing:
 
-# Refactoring this exercise:
-
-* Create the first.js page
-* Create the index.js page to link to those
-    * Link is below
-    * Duplicate first.js to be second.js
-
-
--------------------------------------------------------------------------------------------------------------------
-
-# Refactor
-
 # Creating the content and structures
 * Create the content:
     * Create Some embedded files
@@ -27,7 +15,11 @@
         * second/one
         * second/two
 
-    * Use the src/pages/{MarkdownRemark.parent__(File)__relativeDirectory}/{MarkdownRemark.parent__(File)__name}.js    
+    * Use the 
+        * Create the directory
+        * src/pages/{MarkdownRemark.parent__(File)__relativeDirectory}/
+        * Add the file to the above : {MarkdownRemark.parent__(File)__name}.js    
+
         * Completed component:
         ```jsx
         import React from "react"
@@ -64,35 +56,37 @@
 
 # Creating links to the new pages
 
-* first.js
-    * src/pages/first.js
-    ```jsx
-    import * as React from "react"
-    import { grapqhl, Link } from "gatsby"
+* Create src/pages/first.js
+    * first.js
+        * src/pages/first.js
+        ```jsx
+        import * as React from "react"
+        import { graphql, Link } from "gatsby"
 
-    export default function Page()
-    {
-        return (
-            <div>
-                This is the page!
-            </div>
-        );
-    }
-    ```
+        export default function Page()
+        {
+            return (
+                <div>
+                    This is the page!
+                </div>
+            );
+        }
+        ```
 
     * You can now route to this page via localhost:8000/first
 
 * Get the children and render them out
-    * We're trying to grab the first/one.md and first/two.md pages
-    * Create a query that can select markdown pages with the relative directory of "first"
     * localhost:8000/__grapqhl
+    * Create a query that:
+        * grabs all markdown pages
+        * from src/pages/first
+
     * Result:
     ```js
-    query MyQuery {
+    query {
       allFile(filter: {relativeDirectory: {eq: "first"}}) {
         nodes {
           name
-          relativeDirectory
         }
       }
     }

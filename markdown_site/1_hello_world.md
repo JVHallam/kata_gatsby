@@ -28,10 +28,11 @@ gatsby develop
 * Create the markdown directory, with content
     * Create the directory src/pages/markdown
     * Put in some markdown pages
-        * first.md
+        * src/pages/markdown/first.md
             * Give it the heading "# First Page"
             * Give it the paragraph "Hey, this is the first page!"
-        * second.md
+
+        * src/pages/markdown/second.md
             * Give it the heading "# Second Page"
             * Give it the paragraph "Hey, this is the second page!"
 
