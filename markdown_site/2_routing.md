@@ -56,7 +56,7 @@
 
 # Creating links to the new pages
 
-* Create src/pages/first.js
+* Create the first branching point
     * first.js
         * src/pages/first.js
         ```jsx
