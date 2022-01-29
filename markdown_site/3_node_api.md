@@ -2,10 +2,10 @@
 
 # Pre-reqs:
 * Using the files
-    * /first/one.md
-    * /first/two.md
-    * /second/one.md
-    * /second/two.md
+    * /src/pages/markdown/first/one.md
+    * /src/pages/markdown/first/two.md
+    * /src/pages/markdown/second/one.md
+    * /src/pages/markdown/second/two.md
 
 # Hello World!
 * Reporter and hooks: 
@@ -20,8 +20,9 @@
     * gatsby develop -> info at the top, should show the "hello world"
 
 * Create a page:
+    * Create Directory : src/pages/templates
     * Create the hello-world component:
-        * src/pages/template/hello-world.js
+        * src/pages/templates/hello-world.js
         ```js
         import * as React from "react";
 
@@ -91,56 +92,64 @@
         * restart the dev server
         * 404 page
         * Do these pages exist:
-            * /first/one
-            * /first/two
-            * /second/one
-            * /second/two
+            * markdown/first/one
+            * markdown/first/two
+            * markdown/second/one
+            * markdown/second/two
 
-* Render out the expected contents
-    * Pass in context ( relativeDirectory + name + id + stuff )
+# Render out the expected contents
+* Add id to the routing query
+    ```
+    const result = await graphql(`
+        query MyQuery {
+            allMarkdownRemark {
+                nodes {
+                    id
+                    parent {
+                        ... on File {
+                            relativeDirectory
+                            name
+                        }
+                    }
+                }
+            }
+        }
+    `);
 
-    * Use that and the code from kata 2 to render out the page
+    ```
 
-# Render out the tree to those:
-* create the template for first / second
-* pass it the context it's name -> ( first, second )
-    * Get this from the directory names maybe?
-* render out it's name
-* use a grapqhl query on the page, to render out the above
+* Pass that in as context:
+```js
+createPage({
+    path: `${relativeDirectory}/${name}`,
+    component: helloWorldComponent,
+    context : {
+        id
+    }
+});
+```
 
-# Route to the above from index
-* Oof, how to do this best? - Directory names maybe?
+* Use that in the template query to get the markdown html
+```js
+export const query = graphql`
+query($id : String!)
+{
+    markdownRemark(id: { eq : $id })
+    {
+        html
+    }
+}
+`;
+```
 
+* Render that out
+```jsx
+<div dangerouslySetInnerHTML={{ __html :  html }} />
+```
 
+* test:
+    * 
 
------------------------------------------------------
-* Focus on doing node stuff, with routing too
-    * This focuses on the gatsby-node.js
-
-* Maybe make a plugin?! OOOOOOOOOOOH!
-
-# Do some routing with CreatePages
-
-index/
-    /repos
-        /katas
-            /kata.md
-
-* So i'll need 3 route creators
-    * repos
-    * katas
-    * katas
-
-* I'll then need to link between the 3
-
-* YOU CAN PASS CONTEXT TO COMPONENTS! You might not even have to re-query
-    * Go on faggot, i bet you could use a recursive function for this
-    * allFile -> Get all the files in the katas directory
-    * Recursively use createPage
-
-# Some more interesting node apis:
-* createResolvers - Extends grapqhl
-* createSchemaCustomization - full on extras to graphql schemas
-* onCreateNode -> On every node, could do something funny
-* onCreatePage -> If you want to make changes to every page, for whatever reason
-* resolvableExtensions -> Change which extensions gatsby supports
+# Update index 
+* Use the same query as the routing
+* Map all nodes and render them out
