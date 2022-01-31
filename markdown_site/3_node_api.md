@@ -1,13 +1,8 @@
 # Gatsby Node API
 
-# Pre-reqs:
-* Using the files
-    * /src/pages/markdown/first/one.md
-    * /src/pages/markdown/first/two.md
-    * /src/pages/markdown/second/one.md
-    * /src/pages/markdown/second/two.md
+## Common Step : Create the markdown content
 
-# Hello World!
+## Hello World!
 * Reporter and hooks: 
     * create "gatsby-node.js"
     * Create the onPreInit Hook
@@ -30,13 +25,14 @@
         {
             return (
                 <div>
-                    This is my dumb page
+                    This is my sick template
                 </div>
             );
         }
         ```
 
     * Render it from gatsby-node.js
+        * This needs to be more indepth about adding stuff
     ```js
     const path = require(`path`)
     exports.createPages = async ({ graphql, actions }) => {
@@ -50,12 +46,12 @@
     }
     ```
 
-    * Navigate to it
-        * Restart gatsby dev server
-        * 404
-        * See if it's there
+* Navigate to it
+    * Restart gatsby dev server
+    * 404
+    * See if it's there
 
-# Render out the markdown pages
+## Render out the markdown pages
 * Create the routes:
     * Query for the pages
     ```
@@ -97,7 +93,13 @@
             * markdown/second/one
             * markdown/second/two
 
-# Render out the expected contents
+## Render out the expected contents
+
+---
+This section needs to be broken down into sections
+---
+
+
 * Add id to the routing query
     ```
     const result = await graphql(`
@@ -120,6 +122,8 @@
 
 * Pass that in as context:
 ```js
+const { id } = node;
+
 createPage({
     path: `${relativeDirectory}/${name}`,
     component: helloWorldComponent,
@@ -142,14 +146,41 @@ query($id : String!)
 `;
 ```
 
+* extract the html from the props
+    ```js
+    export default function Page({ data }){
+        const { html } = data.markdownRemark;
+    ```
+
 * Render that out
 ```jsx
 <div dangerouslySetInnerHTML={{ __html :  html }} />
 ```
 
 * test:
-    * 
+    * Navigate the 404's again
+    * Check that each page renders out it's contents
 
 # Update index 
 * Use the same query as the routing
+    ```
+    query MyQuery {
+        allMarkdownRemark {
+            nodes {
+                parent {
+                    ... on File {
+                        relativeDirectory
+                        name
+                    }
+                }
+            }
+        }
+    }
+    ```
+
 * Map all nodes and render them out
+    * Map each one to a Link
+    * the Link to=./relativeDirectory/name
+
+* Render them out
+    * <ul> { links } </ul>
