@@ -1,21 +1,69 @@
 # We're doing REACT stuff this time around
-* <Link> There's this?!
-    * import { Link, graphql } from 'gatsby'
 
-* Mapping:
-    * <Link key={index} to={name}> Value </Link>
+# Getting a Layout component
+* Create an example page
+    * src/pages/example.js
+    ```js
+    import * as React from "react";
+    import { graphql } from "gatsby";
 
-* I could have a quick section on Some React stuff
-    * Layout Components:
-        * src/components/layout.js
-        * https://www.gatsbyjs.com/docs/how-to/routing/layout-components/ 
-        * Again, wrap your pages in a layout component
-        * combine it with https://www.gatsbyjs.com/docs/reference/config-files/gatsby-ssr/#wrapPageElement
-        * That auto wraps your page with content
+    export default function Page()
+    {
+        return (
+            <div>
+                This is a super bland page
+            </div>
+        );
+    }
+    ```
 
-* State persistance and toggles
-    * This would be a react part
-    * Saving state
-        * Retrieving state
-        * Very basic. I'm looking to save a single boolean
-    * A toggle to hide / show code examples
+* Create the layout
+    * Create the src/components/layout.js
+    ```
+    import React from "react";
+
+    export default function Layout({ children })
+    {
+        return (
+                <div>
+                    This is the layout component
+                    <div>
+                        { children }
+                    </div>
+                </div>
+        );
+    }
+    ```
+
+* Use it
+    * src/pages/example.js
+    ```
+    return (
+        <Layout>
+            <div>
+                This is a super bland page
+            </div>
+        </Layout>
+    );
+    ```
+
+* Test it:
+    * Navigate to /example
+    * check that the super bland page is now wrapped by the layout component
+
+# State management
+* Create a react hook, for a toggle
+```js
+```
+
+* Create a custom react hook function
+
+* Create an element that hides on stuff
+* Add in stuff to persist the state between refreshes
+* Move that to another file
+
+# Debugging:
+* gatsby develop --inspect
+* chrome://inspect
+* setup sources
+* Hit a breakpoint on the above toggle
