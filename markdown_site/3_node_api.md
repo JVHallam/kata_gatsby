@@ -1,23 +1,28 @@
 # Gatsby Node API
-
-## Common Step : Create the markdown content
+This kata is focused on using the Gatsby Node API.
+This way, we can define dynamic routes, that are built using templates.
 
 ## Hello World!
 * Reporter and hooks: 
-    * create "gatsby-node.js"
+    * Create File : ./gatsby-node.js
     * Create the onPreInit Hook
-    * Echo "hello world"
-        ```js
-        exports.onPreInit = ({ reporter }) => {
-          reporter.info(`Hello World!`);
-        }
-        ```
+
+* Echo "hello world"
+    ```js
+    exports.onPreInit = ({ reporter }) => {
+      reporter.info(`Hello World!`);
+    }
+    ```
+
+* Test it:
     * gatsby develop -> info at the top, should show the "hello world"
 
+## Create a page:
 * Create a page:
-    * Create Directory : src/pages/templates
+    * Create Directory : src/templates
+
     * Create the hello-world component:
-        * src/pages/templates/hello-world.js
+        * src/templates/hello-world.js
         ```js
         import * as React from "react";
 
@@ -31,13 +36,31 @@
         }
         ```
 
-    * Render it from gatsby-node.js
-        * This needs to be more indepth about adding stuff
+* Render it from gatsby-node.js
+    * Require the path module
     ```js
     const path = require(`path`)
+    ```
+
+    * use the createPage hook
+    ```js
+    exports.createPages = async ({ graphql, actions }) => {
+    }
+    ```
+
+    * Load in the template component
+    ```js
     exports.createPages = async ({ graphql, actions }) => {
         const { createPage } = actions;
         const helloWorldComponent = path.resolve("src/templates/hello-world.js");
+    }
+    ```
+
+    * Create the page using the template
+    ```js
+    exports.createPages = async ({ graphql, actions }) => {
+
+        ...
 
         createPage({
             path: "hello-world",
@@ -48,139 +71,110 @@
 
 * Navigate to it
     * Restart gatsby dev server
-    * 404
-    * See if it's there
+    * Navigate  : /t/404
+    * Test      : /hello-world should appear
+
+## Common Step : Create the markdown content
 
 ## Render out the markdown pages
 * Create the routes:
-    * Query for the pages
-    ```
-    const result = await graphql(`
-        query MyQuery {
-            allMarkdownRemark {
-                nodes {
-                    parent {
-                        ... on File {
-                            relativeDirectory
-                            name
+    * Query for the pages' file names
+    ```js
+    exports.createPages = async ({ graphql, actions }) => {
+        ...
+
+        const result = await graphql(`
+            query MyQuery {
+                allMarkdownRemark {
+                    nodes {
+                        parent {
+                            ... on File {
+                                relativeDirectory
+                                name
+                            }
                         }
                     }
                 }
             }
-        }
-    `);
-
+        `);
+    }
     ```
 
     * Render a page per node - render out the helloWorldComponent from earlier
     ```js
-    result.data.allMarkdownRemark.nodes.forEach(node => {
-        const { relativeDirectory, name } = node.parent;
+    exports.createPages = async ({ graphql, actions }) => {
+        ...
+        //After the query
 
-        createPage({
-            path: `${relativeDirectory}/${name}`,
-            component: helloWorldComponent,
+        result.data.allMarkdownRemark.nodes.forEach(node => {
+            const { relativeDirectory, name } = node.parent;
+
+            createPage({
+                path: `${relativeDirectory}/${name}`,
+                component: helloWorldComponent,
+            })
         })
-    })
+    }
     ```
 
-    * Check the pages exist:
-        * restart the dev server
-        * 404 page
-        * Do these pages exist:
-            * markdown/first/one
-            * markdown/first/two
-            * markdown/second/one
-            * markdown/second/two
+* Extend hello-world.js to render out the markdown
+    * gatsby-node.js
+        * Add "fileAbsolutePath" to the "nodes" part of the query
+        ```js
+        const result = await graphql(`
+            query MyQuery {
+                allMarkdownRemark {
+                    nodes {
+                        fileAbsolutePath
 
-## Render out the expected contents
-
----
-This section needs to be broken down into sections
----
-
-
-* Add id to the routing query
-    ```
-    const result = await graphql(`
-        query MyQuery {
-            allMarkdownRemark {
-                nodes {
-                    id
-                    parent {
-                        ... on File {
-                            relativeDirectory
-                            name
+                        parent {
+                            ... on File {
+                                relativeDirectory
+                                name
+                            }
                         }
                     }
                 }
             }
-        }
-    `);
+        `);
+        ```
 
+        * Pass that in as context to the create page
+
+    * Pass the filename or something into the page as context
+
+    * Use it to query for that page
     ```
-
-* Pass that in as context:
-```js
-const { id } = node;
-
-createPage({
-    path: `${relativeDirectory}/${name}`,
-    component: helloWorldComponent,
-    context : {
-        id
-    }
-});
-```
-
-* Use that in the template query to get the markdown html
-```js
-export const query = graphql`
-query($id : String!)
-{
-    markdownRemark(id: { eq : $id })
-    {
+    export const query = graphql`
+    query MyQuery($fileAbsolutePath : String!){
+      markdownRemark(fileAbsolutePath: {eq: $fileAbsolutePath}) {
         html
+      }
     }
-}
-`;
-```
-
-* extract the html from the props
-    ```js
-    export default function Page({ data }){
-        const { html } = data.markdownRemark;
+    `;
     ```
 
-* Render that out
-```jsx
-<div dangerouslySetInnerHTML={{ __html :  html }} />
-```
+    * Render out the innerHtml
+        * Break the below down:
+        ```js
+        export default function Page({ data })
+        {
+            console.log(data);
+            const { html } = data.markdownRemark;
 
-* test:
-    * Navigate the 404's again
-    * Check that each page renders out it's contents
-
-# Update index 
-* Use the same query as the routing
-    ```
-    query MyQuery {
-        allMarkdownRemark {
-            nodes {
-                parent {
-                    ... on File {
-                        relativeDirectory
-                        name
-                    }
-                }
-            }
+            return (
+                <div dangerouslySetInnerHTML={{__html : html}}></div>
+            );
         }
-    }
-    ```
+        ```
 
-* Map all nodes and render them out
-    * Map each one to a Link
-    * the Link to=./relativeDirectory/name
+* Check the pages exist:
+    * restart the dev server
+    * 404 page
+    * Do these pages exist:
+        * markdown/first/one
+        * markdown/first/two
+        * markdown/second/one
+        * markdown/second/two
 
-* Render them out
-    * <ul> { links } </ul>
+    * Do they have contents that match the markdown files?
