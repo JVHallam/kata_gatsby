@@ -24,7 +24,7 @@ This way, we can define dynamic routes, that are built using templates.
     * Create the hello-world component:
         * src/templates/hello-world.js
         ```js
-        import * as React from "react";
+        import React from "react";
 
         export default function Page()
         {
@@ -39,7 +39,7 @@ This way, we can define dynamic routes, that are built using templates.
 * Render it from gatsby-node.js
     * Require the path module
     ```js
-    const path = require(`path`)
+    const path = require("path")
     ```
 
     * use the createPage hook
@@ -101,6 +101,7 @@ This way, we can define dynamic routes, that are built using templates.
     ```
 
     * Render a page per node - render out the helloWorldComponent from earlier
+        * Path should be directory/filename
     ```js
     exports.createPages = async ({ graphql, actions }) => {
         ...
@@ -140,26 +141,39 @@ This way, we can define dynamic routes, that are built using templates.
         ```
 
         * Pass that in as context to the create page
+        ```js
+        result.data.allMarkdownRemark.nodes.forEach(node => {
+            ...
 
-    * Pass the filename or something into the page as context
+            const { fileAbsolutePath } = node;
 
-    * Use it to query for that page
-    ```
-    export const query = graphql`
-    query MyQuery($fileAbsolutePath : String!){
-      markdownRemark(fileAbsolutePath: {eq: $fileAbsolutePath}) {
-        html
-      }
-    }
-    `;
-    ```
+            createPage({
+                ...
+
+                context : {
+                    fileAbsolutePath
+                }
+            });
+        });
+        ```
+
+    * Update the page
+        * Use the query to get the html
+        ```js
+        export const query = graphql`
+        query MyQuery($fileAbsolutePath : String!){
+          markdownRemark(fileAbsolutePath: {eq: $fileAbsolutePath}) {
+            html
+          }
+        }
+        `;
+        ```
 
     * Render out the innerHtml
         * Break the below down:
         ```js
         export default function Page({ data })
         {
-            console.log(data);
             const { html } = data.markdownRemark;
 
             return (
